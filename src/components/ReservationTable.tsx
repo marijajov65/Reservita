@@ -18,13 +18,12 @@ const ReservationTable: React.FC = () => {
   );
 
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedTime, setSelectedTime] = useState('');
+  const [selectedStartTime, setSelectedStartTime] = useState('');
   const [selectedCourt, setSelectedCourt] = useState('');
 
-
   const handleCellClick = (params: any) => {
-    const clickedTime = params.row.time;
-    setSelectedTime(clickedTime);
+    const selectedTime = params.row.time;
+    setSelectedStartTime(selectedTime);
     const court = params.field;
     setSelectedCourt(court);
     setOpenDialog(true);
@@ -34,7 +33,11 @@ const ReservationTable: React.FC = () => {
     setOpenDialog(false);
   };
 
-  const handleConfirmBooking = (name: string, startTime: string, endTime: string) => {
+  const handleConfirmBooking = (
+    name: string,
+    startTime: string,
+    endTime: string,
+  ) => {
     setOpenDialog(false);
 
     const timeToMinutes = (time: string): number => {
@@ -64,7 +67,6 @@ const ReservationTable: React.FC = () => {
   };
 
   const timeRange = generateTimeRange(7, 23, 30);
-  const availableEndTimes = timeRange.filter((time) => time > selectedTime);
 
   return (
     <Box style={{ height: '100%', width: '100%' }}>
@@ -98,11 +100,11 @@ const ReservationTable: React.FC = () => {
 
       <NewReservationDialog
         open={openDialog}
-        defaultStartTime={selectedTime}
+        defaultStartTime={selectedStartTime}
         onClose={handleDialogClose}
         onConfirm={handleConfirmBooking}
         startTimes={timeRange}
-        availableEndTimes={availableEndTimes}
+        availableTimes={timeRange}
       />
     </Box>
   );

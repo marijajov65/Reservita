@@ -16,9 +16,9 @@ interface NewReservationProps {
   open: boolean;
   defaultStartTime: string;
   onClose: () => void;
-  onConfirm: (name: string, startTime:string, endTime: string) => void;
+  onConfirm: (name: string, startTime: string, endTime: string) => void;
   startTimes: string[];
-  availableEndTimes: string[];
+  availableTimes: string[];
 }
 
 const NewReservationDialog: React.FC<NewReservationProps> = ({
@@ -27,10 +27,10 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
   onClose,
   onConfirm,
   startTimes,
-  availableEndTimes,
+  availableTimes,
 }) => {
   const [name, setName] = useState('');
-  const [selectedStartTime, setSelectedStartTime] = useState(defaultStartTime);
+  const [selectedStartTime, setSelectedStartTime] = useState('');
   const [selectedEndTime, setSelectedEndTime] = useState('');
 
   const handleConfirm = () => {
@@ -38,11 +38,17 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
       onConfirm(name, selectedStartTime, selectedEndTime);
     }
   };
+  console.log(defaultStartTime);
 
   useEffect(() => {
+    setSelectedStartTime(defaultStartTime);
     setName('');
     setSelectedEndTime('');
   }, [open]);
+
+  const availableEndTimes = availableTimes.filter(
+    (time) => time > selectedStartTime,
+  );
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -52,11 +58,12 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
           margin="dense"
           label="Ime i prezime"
           type="text"
+          required
           fullWidth
           onChange={(e) => setName(e.target.value)}
         />
 
-        <FormControl fullWidth margin="dense">
+        <FormControl fullWidth required margin="dense">
           <InputLabel id="time-select-label">Od</InputLabel>
           <Select
             labelId="time-select-label"
@@ -72,7 +79,7 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
           </Select>
         </FormControl>
 
-        <FormControl fullWidth margin="dense">
+        <FormControl fullWidth required margin="dense">
           <InputLabel id="time-select-label">Do</InputLabel>
           <Select
             labelId="time-select-label"
