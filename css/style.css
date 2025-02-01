@@ -57,24 +57,6 @@ header {
   width: 100%;
 }
 
-button {
-  font-family: 'JetBrains Mono', Inter, system-ui, sans-serif;
-  background-color: rgba(25, 25, 28, 0.5);
-  cursor: pointer;
-  color: rgba(255, 255, 255, 1);
-}
-
-button:hover {
-  background-image: radial-gradient(
-    farthest-corner at 77% 83%,
-    rgba(1, 197, 245, 0.5) 2%,
-    rgba(1, 126, 254, 0.5) 28%,
-    rgba(25, 25, 28, 0) 70%
-  );
-  border: 1px solid rgba(76, 166, 255, 0.2);
-  background-clip: padding-box;
-}
-
 footer {
   margin-bottom: 36px;
   align-self: center;
