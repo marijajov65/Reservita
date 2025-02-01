@@ -1,0 +1,81 @@
+@font-face {
+  font-family: 'JetBrains Sans';
+  src: url('../fonts/JetBrainsSans-Regular.woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('../fonts/JetBrainsMono-Regular.woff2');
+}
+
+:root {
+  font-family: 'JetBrains Sans', Inter, system-ui, Avenir, Helvetica, Arial,
+    sans-serif;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #ffffff;
+  text-align: center;
+}
+
+body {
+  margin: 0; /* Remove default margin */
+  padding: 0; /* Remove default padding */
+  width: 100%; /* Ensure body takes up full width */
+  height: 100%; /* Ensure body spans the full viewport height */
+  justify-content: center; /* Center the main horizontally */
+  align-items: center; /* Center the main vertically */
+}
+
+main {
+  display: flex;
+  flex-direction: column; /* Allow for vertical alignment */
+  /*justify-content: center; !* Center content vertically *!*/
+  align-items: center; /* Center content horizontally */
+  min-height: 100vh; /* Ensure main spans full viewport height */
+  width: 100%; /* Ensure main spans full width */
+  background-size: contain; /* Scale image to fit its container */
+  background-position: center center; /* Keep image centered */
+  background-repeat: no-repeat; /* Prevent tiling */
+  /*background-attachment: fixed; !* Optional: Keeps background fixed on scroll *!*/
+  box-sizing: border-box; /* Ensure padding/borders don't affect size */
+  background-color: #f0f0f0; /* bg color for contrast */
+}
+
+h1 {
+  font-size: 29px;
+  line-height: 39px;
+  font-weight: 300;
+}
+
+.title {
+  margin-bottom: 40px;
+}
+
+header {
+  margin-top: 45px;
+  margin-left: 20%;
+  align-self: flex-start;
+}
+
+button {
+  font-family: 'JetBrains Mono', Inter, system-ui, sans-serif;
+  background-color: rgba(25, 25, 28, 0.5);
+  cursor: pointer;
+  color: rgba(255, 255, 255, 1);
+}
+
+button:hover {
+  background-image: radial-gradient(
+    farthest-corner at 77% 83%,
+    rgba(1, 197, 245, 0.5) 2%,
+    rgba(1, 126, 254, 0.5) 28%,
+    rgba(25, 25, 28, 0) 70%
+  );
+  border: 1px solid rgba(76, 166, 255, 0.2);
+  background-clip: padding-box;
+}
+
+footer {
+  margin-bottom: 36px;
+  align-self: center;
+}
