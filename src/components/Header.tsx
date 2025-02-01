@@ -11,7 +11,7 @@ const Header = () => {
   };
 
   return (
-    <header style={{ backgroundColor: '#f0f0f0' }}>
+    <header>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <DesktopDatePicker
           label="Izaberite datum"
