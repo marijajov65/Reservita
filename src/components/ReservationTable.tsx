@@ -15,7 +15,7 @@ const ReservationTable: React.FC = () => {
         rowHeight={25}
         sx={{
           '& .MuiDataGrid-virtualScrollerRenderZone': {
-            backgroundImage: 'url("/images/tk_borac_logo_bw.png")',
+            backgroundImage: 'url("Reservita/images/tk_borac_logo_bw.png")',
             backgroundSize: 'contain',
             backgroundPosition: 'center calc(50% + 2vh)',
             backgroundRepeat: 'no-repeat',

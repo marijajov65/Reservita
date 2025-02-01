@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: '/',
+  base: '/Reservita',
   build: {
     chunkSizeWarningLimit: 100,
     rollupOptions: {
