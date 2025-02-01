@@ -52,9 +52,9 @@ h1 {
 }
 
 header {
-  margin-top: 45px;
-  margin-left: 20%;
-  align-self: flex-start;
+  margin: 10px;
+  justify-content: center;
+  width: 100%;
 }
 
 button {
