@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Dialog,
   DialogActions,
@@ -24,45 +24,50 @@ interface NewReservationProps {
 }
 
 const NewReservationDialog: React.FC<NewReservationProps> = ({
-  open,
-  defaultStartTime,
-  onClose,
-  onConfirm,
-  availableTimes,
-}) => {
-  const [name, setName] = useState('');
-  const [nameError, setNameError] = useState(false);
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const [details, setDetails] = useState('');
+                                                               open,
+                                                               defaultStartTime,
+                                                               onClose,
+                                                               onConfirm,
+                                                               availableTimes,
+                                                             }) => {
+
+  const [reservationData, setReservationData] = useState<Reservation>({
+    startTime: defaultStartTime,
+    endTime: addHours(defaultStartTime, 1),
+    name: '',
+    details: '',
+  });
 
   useEffect(() => {
-    setName('');
-    setNameError(false);
-    setStartTime(defaultStartTime);
-    setEndTime(addHours(defaultStartTime, 1));
-  }, [open]);
+    setReservationData({
+      name: '',
+      startTime: defaultStartTime,
+      endTime: addHours(defaultStartTime, 1),
+      details: '',
+    });
+  }, [open, defaultStartTime]);
 
+  // Update endTime when startTime changes
   useEffect(() => {
-    setEndTime(addHours(startTime, 1));
-  }, [startTime]);
+    setReservationData((prevState) => ({
+      ...prevState,
+      endTime: addHours(prevState.startTime, 1),
+    }));
+  }, [reservationData.startTime]);
 
-  const validEndTimes = availableTimes.filter((time) => time > startTime);
+  const validEndTimes = useMemo(
+    () => availableTimes.filter((time) => time > reservationData.startTime),
+    [availableTimes, reservationData.startTime]
+  );
 
-  const handleConfirm = () => {
-    const isNameEmpty = name.trim() === '';
-    if (isNameEmpty) {
-      setNameError(true);
-      return;
-    }
-    const reservation: Reservation = {
-      name: name,
-      startTime: startTime,
-      endTime: endTime,
-      details: details,
-    };
-    onConfirm(reservation);
+  const handleChange = (field: keyof Reservation, value: string) => {
+    setReservationData((prevState) => ({
+      ...prevState,
+      [field]: value,
+    }));
   };
+
+  const isFormValid = reservationData.name.trim() !== '';
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -74,23 +79,21 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
           label="Ime i prezime"
           type="text"
           required
-          onChange={(e) => setName(e.target.value)}
-          error={nameError}
-          helperText={nameError ? 'Ime i prezime je obavezno' : ''}
+          value={reservationData.name}
+          onChange={(e) => handleChange('name', e.target.value)}
         />
 
         <Box display="flex" gap={2} alignItems="center">
           <FormControl fullWidth margin="dense" required>
-            <InputLabel id="time-select-label">Od</InputLabel>
+            <InputLabel id="start-time-label">Od</InputLabel>
             <Select
-              labelId="time-select-label"
-              error={startTime.trim() === ''}
-              value={startTime}
+              labelId="start-time-label"
+              value={reservationData.startTime}
               label="Pocetak Termina"
-              onChange={(e) => setStartTime(e.target.value)}
+              onChange={(e) => handleChange('startTime', e.target.value)}
             >
-              {availableTimes.map((time, index) => (
-                <MenuItem key={`start_time-${index}`} value={time}>
+              {availableTimes.map((time) => (
+                <MenuItem key={time} value={time}>
                   {time}
                 </MenuItem>
               ))}
@@ -98,15 +101,15 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
           </FormControl>
 
           <FormControl fullWidth margin="dense" required>
-            <InputLabel id="time-select-label">Do</InputLabel>
+            <InputLabel id="end-time-label">Do</InputLabel>
             <Select
-              labelId="time-select-label"
-              value={endTime}
+              labelId="end-time-label"
+              value={reservationData.endTime}
               label="Kraj Termina"
-              onChange={(e) => setEndTime(e.target.value)}
+              onChange={(e) => handleChange('endTime', e.target.value)}
             >
-              {validEndTimes.map((time, index) => (
-                <MenuItem key={`end_time-${index}`} value={time}>
+              {validEndTimes.map((time) => (
+                <MenuItem key={time} value={time}>
                   {time}
                 </MenuItem>
               ))}
@@ -121,7 +124,8 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
           type="text"
           multiline
           rows={4}
-          onChange={(e) => setDetails(e.target.value)}
+          value={reservationData.details}
+          onChange={(e) => handleChange('details', e.target.value)}
         />
       </DialogContent>
 
@@ -129,7 +133,7 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
         <Button onClick={onClose} variant="outlined">
           Otkaži
         </Button>
-        <Button onClick={handleConfirm} variant="contained">
+        <Button onClick={() => onConfirm(reservationData)} variant="contained" disabled={!isFormValid}>
           Potvrdi
         </Button>
       </DialogActions>
