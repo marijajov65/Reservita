@@ -54,7 +54,7 @@ const ReservationTable: React.FC = () => {
       if (rowMinutes >= startMinutes && rowMinutes < endMinutes) {
         return {
           ...row,
-          [selectedCourt]: `${reservation.name} - ${reservation.details}`,
+          [selectedCourt]: `${reservation.name} ${reservation.details}`,
         };
       }
       return row;

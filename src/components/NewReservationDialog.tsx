@@ -24,13 +24,12 @@ interface NewReservationProps {
 }
 
 const NewReservationDialog: React.FC<NewReservationProps> = ({
-                                                               open,
-                                                               defaultStartTime,
-                                                               onClose,
-                                                               onConfirm,
-                                                               availableTimes,
-                                                             }) => {
-
+  open,
+  defaultStartTime,
+  onClose,
+  onConfirm,
+  availableTimes,
+}) => {
   const [reservationData, setReservationData] = useState<Reservation>({
     startTime: defaultStartTime,
     endTime: addHours(defaultStartTime, 1),
@@ -57,7 +56,7 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
 
   const validEndTimes = useMemo(
     () => availableTimes.filter((time) => time > reservationData.startTime),
-    [availableTimes, reservationData.startTime]
+    [availableTimes, reservationData.startTime],
   );
 
   const handleChange = (field: keyof Reservation, value: string) => {
@@ -133,7 +132,11 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
         <Button onClick={onClose} variant="outlined">
           Otkaži
         </Button>
-        <Button onClick={() => onConfirm(reservationData)} variant="contained" disabled={!isFormValid}>
+        <Button
+          onClick={() => onConfirm(reservationData)}
+          variant="contained"
+          disabled={!isFormValid}
+        >
           Potvrdi
         </Button>
       </DialogActions>
