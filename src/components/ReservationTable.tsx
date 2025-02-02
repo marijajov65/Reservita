@@ -55,10 +55,8 @@ const ReservationTable: React.FC = () => {
         return {
           ...row,
           [selectedCourt]: `${reservation.name} - ${reservation.details}`,
-          [`${selectedCourt}_highlighted`]: true, // Mark the cell as highlighted
         };
       }
-
       return row;
     });
     setRows(updatedRows);
@@ -72,6 +70,7 @@ const ReservationTable: React.FC = () => {
         disableColumnResize={true}
         disableColumnMenu={true}
         disableColumnSorting={true}
+        disableRowSelectionOnClick={true}
         rowHeight={25}
         onCellClick={handleCellClick}
         sx={{
