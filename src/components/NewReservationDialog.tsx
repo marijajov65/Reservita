@@ -10,14 +10,16 @@ import {
   FormControl,
   InputLabel,
   MenuItem,
+  Box,
 } from '@mui/material';
+import { addHours } from '../helpers/timeHelper.ts';
+import { Reservation } from '../models/Reservation.ts';
 
 interface NewReservationProps {
   open: boolean;
   defaultStartTime: string;
   onClose: () => void;
-  onConfirm: (name: string, startTime: string, endTime: string) => void;
-  startTimes: string[];
+  onConfirm: (reservation: Reservation) => void;
   availableTimes: string[];
 }
 
@@ -26,80 +28,108 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
   defaultStartTime,
   onClose,
   onConfirm,
-  startTimes,
   availableTimes,
 }) => {
   const [name, setName] = useState('');
-  const [selectedStartTime, setSelectedStartTime] = useState('');
-  const [selectedEndTime, setSelectedEndTime] = useState('');
-
-  const handleConfirm = () => {
-    if (selectedEndTime) {
-      onConfirm(name, selectedStartTime, selectedEndTime);
-    }
-  };
-  console.log(defaultStartTime);
+  const [nameError, setNameError] = useState(false);
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [details, setDetails] = useState('');
 
   useEffect(() => {
-    setSelectedStartTime(defaultStartTime);
     setName('');
-    setSelectedEndTime('');
+    setNameError(false);
+    setStartTime(defaultStartTime);
+    setEndTime(addHours(defaultStartTime, 1));
   }, [open]);
 
-  const availableEndTimes = availableTimes.filter(
-    (time) => time > selectedStartTime,
-  );
+  useEffect(() => {
+    setEndTime(addHours(startTime, 1));
+  }, [startTime]);
+
+  const validEndTimes = availableTimes.filter((time) => time > startTime);
+
+  const handleConfirm = () => {
+    const isNameEmpty = name.trim() === '';
+    if (isNameEmpty) {
+      setNameError(true);
+      return;
+    }
+    const reservation: Reservation = {
+      name: name,
+      startTime: startTime,
+      endTime: endTime,
+      details: details,
+    };
+    onConfirm(reservation);
+  };
 
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Nova Rezervacija</DialogTitle>
       <DialogContent>
         <TextField
+          fullWidth
           margin="dense"
           label="Ime i prezime"
           type="text"
           required
-          fullWidth
           onChange={(e) => setName(e.target.value)}
+          error={nameError}
+          helperText={nameError ? 'Ime i prezime je obavezno' : ''}
         />
 
-        <FormControl fullWidth required margin="dense">
-          <InputLabel id="time-select-label">Od</InputLabel>
-          <Select
-            labelId="time-select-label"
-            value={selectedStartTime}
-            label="Pocetak Termina"
-            onChange={(e) => setSelectedStartTime(e.target.value)}
-          >
-            {startTimes.map((time, index) => (
-              <MenuItem key={`start_time-${index}`} value={time}>
-                {time}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Box display="flex" gap={2} alignItems="center">
+          <FormControl fullWidth margin="dense" required>
+            <InputLabel id="time-select-label">Od</InputLabel>
+            <Select
+              labelId="time-select-label"
+              error={startTime.trim() === ''}
+              value={startTime}
+              label="Pocetak Termina"
+              onChange={(e) => setStartTime(e.target.value)}
+            >
+              {availableTimes.map((time, index) => (
+                <MenuItem key={`start_time-${index}`} value={time}>
+                  {time}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-        <FormControl fullWidth required margin="dense">
-          <InputLabel id="time-select-label">Do</InputLabel>
-          <Select
-            labelId="time-select-label"
-            value={selectedEndTime}
-            label="Kraj Termina"
-            onChange={(e) => setSelectedEndTime(e.target.value)}
-          >
-            {availableEndTimes.map((time, index) => (
-              <MenuItem key={`end_time-${index}`} value={time}>
-                {time}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+          <FormControl fullWidth margin="dense" required>
+            <InputLabel id="time-select-label">Do</InputLabel>
+            <Select
+              labelId="time-select-label"
+              value={endTime}
+              label="Kraj Termina"
+              onChange={(e) => setEndTime(e.target.value)}
+            >
+              {validEndTimes.map((time, index) => (
+                <MenuItem key={`end_time-${index}`} value={time}>
+                  {time}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+
+        <TextField
+          fullWidth
+          margin="dense"
+          label="Detalji"
+          type="text"
+          multiline
+          rows={4}
+          onChange={(e) => setDetails(e.target.value)}
+        />
       </DialogContent>
+
       <DialogActions>
-        <Button onClick={onClose} color="secondary">
+        <Button onClick={onClose} variant="outlined">
           Otkaži
         </Button>
-        <Button onClick={handleConfirm} color="primary">
+        <Button onClick={handleConfirm} variant="contained">
           Potvrdi
         </Button>
       </DialogActions>

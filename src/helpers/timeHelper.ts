@@ -15,3 +15,12 @@ export const generateTimeRange = (
   }
   return timeArray;
 };
+
+export const addHours = (time: string, hoursToAdd: number) => {
+  const [hour, minute] = time.split(':').map(Number);
+  const totalMinutes = hour * 60 + minute + hoursToAdd * 60;
+  const newHour = Math.floor(totalMinutes / 60) % 24; // Ensure it stays within 24 hours
+  const newMinute = totalMinutes % 60;
+
+  return `${String(newHour).padStart(2, '0')}:${String(newMinute).padStart(2, '0')}`;
+};

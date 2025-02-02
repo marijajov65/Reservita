@@ -3,11 +3,14 @@ import { Box } from '@mui/material';
 import { DataGrid, GridRowsProp } from '@mui/x-data-grid';
 import NewReservationDialog from './NewReservationDialog.tsx';
 import { columns } from '../data/data.ts';
-import { generateTimeRange } from '../utils/timeHelper.ts';
+import { generateTimeRange } from '../helpers/timeHelper.ts';
+import { Reservation } from '../models/Reservation.ts';
 
 const ReservationTable: React.FC = () => {
+  const timeRange = generateTimeRange(7, 23, 30);
+
   const [rows, setRows] = useState<GridRowsProp>(
-    generateTimeRange(7, 23, 30).map((time, index) => ({
+    timeRange.map((time, index) => ({
       id: index + 1,
       time,
       court1: '',
@@ -33,21 +36,16 @@ const ReservationTable: React.FC = () => {
     setOpenDialog(false);
   };
 
-  const handleConfirmBooking = (
-    name: string,
-    startTime: string,
-    endTime: string,
-  ) => {
+  const handleConfirmReservation = (reservation: Reservation) => {
     setOpenDialog(false);
 
     const timeToMinutes = (time: string): number => {
       const [hour, minute] = time.split(':').map(Number);
-      const period = time.includes('PM') && hour !== 12 ? 12 : 0; // Handle PM times
-      return (hour + period) * 60 + minute;
+      return hour * 60 + minute;
     };
 
-    const startMinutes = timeToMinutes(startTime);
-    const endMinutes = timeToMinutes(endTime);
+    const startMinutes = timeToMinutes(reservation.startTime);
+    const endMinutes = timeToMinutes(reservation.endTime);
 
     // Find the range of rows to highlight
     const updatedRows = rows.map((row) => {
@@ -56,7 +54,7 @@ const ReservationTable: React.FC = () => {
       if (rowMinutes >= startMinutes && rowMinutes < endMinutes) {
         return {
           ...row,
-          [selectedCourt]: name, // Overwrite the cell with the name
+          [selectedCourt]: `${reservation.name} - ${reservation.details}`,
           [`${selectedCourt}_highlighted`]: true, // Mark the cell as highlighted
         };
       }
@@ -65,8 +63,6 @@ const ReservationTable: React.FC = () => {
     });
     setRows(updatedRows);
   };
-
-  const timeRange = generateTimeRange(7, 23, 30);
 
   return (
     <Box style={{ height: '100%', width: '100%' }}>
@@ -102,8 +98,7 @@ const ReservationTable: React.FC = () => {
         open={openDialog}
         defaultStartTime={selectedStartTime}
         onClose={handleDialogClose}
-        onConfirm={handleConfirmBooking}
-        startTimes={timeRange}
+        onConfirm={handleConfirmReservation}
         availableTimes={timeRange}
       />
     </Box>
