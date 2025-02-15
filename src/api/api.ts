@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 
 const baseUrl = 'https://reservita-web-app-559b1e35dc1c.herokuapp.com';
 
-export const fetchSchedule = (date: Date | null) => {
+export const fetchSchedule = (date: Date) => {
   if (!date) {
     return Promise.reject('Date is null');
   }
