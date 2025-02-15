@@ -1,34 +1,26 @@
 import React, { useState } from 'react';
 import { Box } from '@mui/material';
-import { DataGrid, GridRowsProp } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import NewReservationDialog from './NewReservationDialog.tsx';
-import { columns } from '../data/data.ts';
-import { generateTimeRange } from '../helpers/timeHelper.ts';
 import { Reservation } from '../models/Reservation.ts';
+import useScheduleData from '../hooks/useScheduleData.ts';
+import { createReservation } from '../api/api.ts';
 
-const ReservationTable: React.FC = () => {
-  const timeRange = generateTimeRange(7, 23, 30);
+interface ReservationTableProps {
+  selectedDate: Date;
+}
 
-  const [rows, setRows] = useState<GridRowsProp>(
-    timeRange.map((time, index) => ({
-      id: index + 1,
-      time,
-      court1: '',
-      court2: '',
-      court3: '',
-      court4: '',
-    })),
-  );
-
+const ReservationTable: React.FC<ReservationTableProps> = ({ selectedDate }) => {
+  const { rows, setRows, columns, availableTimes, loading, error } = useScheduleData(selectedDate);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedStartTime, setSelectedStartTime] = useState('');
-  const [selectedCourt, setSelectedCourt] = useState('');
+  const [selectedCourtId, setSelectedCourtId] = useState(0);
 
   const handleCellClick = (params: any) => {
     const selectedTime = params.row.time;
     setSelectedStartTime(selectedTime);
-    const court = params.field;
-    setSelectedCourt(court);
+    const court = params.colDef.id;
+    setSelectedCourtId(court);
     setOpenDialog(true);
   };
 
@@ -44,8 +36,8 @@ const ReservationTable: React.FC = () => {
       return hour * 60 + minute;
     };
 
-    const startMinutes = timeToMinutes(reservation.startTime);
-    const endMinutes = timeToMinutes(reservation.endTime);
+    const startMinutes = timeToMinutes(reservation.start_time);
+    const endMinutes = timeToMinutes(reservation.end_time);
 
     // Find the range of rows to highlight
     const updatedRows = rows.map((row) => {
@@ -54,18 +46,35 @@ const ReservationTable: React.FC = () => {
       if (rowMinutes >= startMinutes && rowMinutes < endMinutes) {
         return {
           ...row,
-          [selectedCourt]: `${reservation.name} ${reservation.details}`,
+          [selectedCourtId]: `${reservation.name}`,
         };
       }
       return row;
     });
     setRows(updatedRows);
+
+    // Persist
+    const requestData = JSON.stringify({
+      ...reservation,
+      reservation_date: reservation.reservation_date.toISOString().split('T')[0], // Format the date as YYYY-MM-DD
+    });
+
+    createReservation(requestData)
+      .then(() => {
+        console.log('Reservation created.');
+      })
+      .catch((error) => {
+        console.error('Error creating reservation:', error);
+      });
   };
 
   return (
     <Box style={{ height: '100%', width: '100%' }}>
+      {error && <p>{error}</p>}
       <DataGrid
         rows={rows}
+        loading={loading}
+        getRowId={(row) => row.time}
         columns={columns}
         disableColumnResize={true}
         disableColumnMenu={true}
@@ -94,11 +103,13 @@ const ReservationTable: React.FC = () => {
       />
 
       <NewReservationDialog
+        court_id={selectedCourtId}
+        reservation_date={selectedDate}
         open={openDialog}
         defaultStartTime={selectedStartTime}
         onClose={handleDialogClose}
         onConfirm={handleConfirmReservation}
-        availableTimes={timeRange}
+        availableTimes={availableTimes}
       />
     </Box>
   );

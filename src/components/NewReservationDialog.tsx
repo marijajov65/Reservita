@@ -16,6 +16,8 @@ import { addHours } from '../helpers/timeHelper.ts';
 import { Reservation } from '../models/Reservation.ts';
 
 interface NewReservationProps {
+  court_id: number;
+  reservation_date: Date;
   open: boolean;
   defaultStartTime: string;
   onClose: () => void;
@@ -24,6 +26,8 @@ interface NewReservationProps {
 }
 
 const NewReservationDialog: React.FC<NewReservationProps> = ({
+  court_id,
+  reservation_date,
   open,
   defaultStartTime,
   onClose,
@@ -31,18 +35,22 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
   availableTimes,
 }) => {
   const [reservationData, setReservationData] = useState<Reservation>({
-    startTime: defaultStartTime,
-    endTime: addHours(defaultStartTime, 1),
+    court_id: court_id,
+    reservation_date: reservation_date,
+    start_time: defaultStartTime,
+    end_time: addHours(defaultStartTime, 1),
     name: '',
     details: '',
   });
 
   useEffect(() => {
     setReservationData({
-      name: '',
-      startTime: defaultStartTime,
-      endTime: addHours(defaultStartTime, 1),
+      court_id: court_id,
+      reservation_date: reservation_date,
+      start_time: defaultStartTime,
+      end_time: addHours(defaultStartTime, 1),
       details: '',
+      name: '',
     });
   }, [open, defaultStartTime]);
 
@@ -50,13 +58,13 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
   useEffect(() => {
     setReservationData((prevState) => ({
       ...prevState,
-      endTime: addHours(prevState.startTime, 1),
+      end_time: addHours(prevState.start_time, 1),
     }));
-  }, [reservationData.startTime]);
+  }, [reservationData.start_time]);
 
   const validEndTimes = useMemo(
-    () => availableTimes.filter((time) => time > reservationData.startTime),
-    [availableTimes, reservationData.startTime],
+    () => availableTimes.filter((time) => time > reservationData.start_time),
+    [availableTimes, reservationData.start_time],
   );
 
   const handleChange = (field: keyof Reservation, value: string) => {
@@ -69,7 +77,7 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
   const isFormValid = reservationData.name.trim() !== '';
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} autoFocus={false}>
       <DialogTitle>Nova Rezervacija</DialogTitle>
       <DialogContent>
         <TextField
@@ -87,9 +95,9 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
             <InputLabel id="start-time-label">Od</InputLabel>
             <Select
               labelId="start-time-label"
-              value={reservationData.startTime}
+              value={reservationData.start_time}
               label="Pocetak Termina"
-              onChange={(e) => handleChange('startTime', e.target.value)}
+              onChange={(e) => handleChange('start_time', e.target.value)}
             >
               {availableTimes.map((time) => (
                 <MenuItem key={time} value={time}>
@@ -103,9 +111,9 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
             <InputLabel id="end-time-label">Do</InputLabel>
             <Select
               labelId="end-time-label"
-              value={reservationData.endTime}
+              value={reservationData.end_time}
               label="Kraj Termina"
-              onChange={(e) => handleChange('endTime', e.target.value)}
+              onChange={(e) => handleChange('end_time', e.target.value)}
             >
               {validEndTimes.map((time) => (
                 <MenuItem key={time} value={time}>

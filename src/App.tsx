@@ -1,12 +1,12 @@
 import * as React from 'react';
-import Header from './components/Header.tsx';
-import ReservationTable from './components/ReservationTable.tsx';
+import ScheduleManager from './components/ScheduleManager';
 
-const App = () => (
-  <>
-    <Header />
-    <ReservationTable />
-  </>
-);
+const App = () => {
+  return (
+    <>
+      <ScheduleManager />
+    </>
+  );
+};
 
 export default App;
