@@ -1,7 +1,7 @@
-import axios from "axios";
+import axios from 'axios';
 import { format } from 'date-fns';
 
-const baseUrl = 'https://reservita-web-app-559b1e35dc1c.herokuapp.com'
+const baseUrl = 'https://reservita-web-app-559b1e35dc1c.herokuapp.com';
 
 export const fetchSchedule = (date: Date | null) => {
   if (!date) {
@@ -15,9 +15,8 @@ export const fetchCourts = () => {
   return axios.get(`${baseUrl}/courts`);
 };
 
-export const createReservation = (data:string) => {
- return axios.post(`${baseUrl}/reservation/create_reservation`, data, {
-     headers: { 'Content-Type': 'application/json' },
-   }
- )
-}
+export const createReservation = (data: string) => {
+  return axios.post(`${baseUrl}/reservation/create_reservation`, data, {
+    headers: { 'Content-Type': 'application/json' },
+  });
+};

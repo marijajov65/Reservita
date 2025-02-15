@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import { fetchCourts, fetchSchedule } from '../api/api.ts';
 
 interface Court {
@@ -17,14 +17,28 @@ interface Schedule {
 interface ScheduleData {
   rows: any[];
   setRows(rows: any[]): void;
-  columns: { id: number, field: string; headerName: string; editable: boolean; flex: number }[];
+  columns: {
+    id: number;
+    field: string;
+    headerName: string;
+    editable: boolean;
+    flex: number;
+  }[];
   availableTimes: string[];
   loading: boolean;
   error: string | null;
 }
 
 const useScheduleData = (date: Date): ScheduleData => {
-  const [columns, setColumns] = useState<{ id: number, field: string; headerName: string; editable: boolean; flex: number }[]>([]);
+  const [columns, setColumns] = useState<
+    {
+      id: number;
+      field: string;
+      headerName: string;
+      editable: boolean;
+      flex: number;
+    }[]
+  >([]);
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,9 +50,9 @@ const useScheduleData = (date: Date): ScheduleData => {
         const data: Court[] = response.data;
         const dynamicColumns = [
           {
-            field: "time",
+            field: 'time',
             id: 0,
-            headerName: "Vrijeme",
+            headerName: 'Vrijeme',
             editable: false,
             maxWidth: 70,
             flex: 0,
@@ -64,7 +78,7 @@ const useScheduleData = (date: Date): ScheduleData => {
 
     fetchSchedule(date)
       .then((response) => {
-        const schedule: Schedule[] = response.data
+        const schedule: Schedule[] = response.data;
         setRows(response.data);
         console.log(response.data);
         const times = schedule.map((entry) => entry.time);

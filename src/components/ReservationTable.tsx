@@ -10,8 +10,11 @@ interface ReservationTableProps {
   selectedDate: Date;
 }
 
-const ReservationTable: React.FC<ReservationTableProps> = ({ selectedDate }) => {
-  const { rows, setRows, columns, availableTimes, loading, error } = useScheduleData(selectedDate);
+const ReservationTable: React.FC<ReservationTableProps> = ({
+  selectedDate,
+}) => {
+  const { rows, setRows, columns, availableTimes, loading, error } =
+    useScheduleData(selectedDate);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedStartTime, setSelectedStartTime] = useState('');
   const [selectedCourtId, setSelectedCourtId] = useState(0);
@@ -56,7 +59,9 @@ const ReservationTable: React.FC<ReservationTableProps> = ({ selectedDate }) => 
     // Persist
     const requestData = JSON.stringify({
       ...reservation,
-      reservation_date: reservation.reservation_date.toISOString().split('T')[0], // Format the date as YYYY-MM-DD
+      reservation_date: reservation.reservation_date
+        .toISOString()
+        .split('T')[0], // Format the date as YYYY-MM-DD
     });
 
     createReservation(requestData)
