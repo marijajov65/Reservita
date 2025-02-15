@@ -12,7 +12,7 @@ export const fetchSchedule = (date: Date) => {
 };
 
 export const fetchCourts = () => {
-  return axios.get(`${baseUrl}/courts`);
+  return axios.get(`${baseUrl}/courts/all_courts`);
 };
 
 export const createReservation = (data: string) => {
