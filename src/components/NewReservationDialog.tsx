@@ -26,14 +26,14 @@ interface NewReservationProps {
 }
 
 const NewReservationDialog: React.FC<NewReservationProps> = ({
-                                                               court_id,
-                                                               reservation_date,
-                                                               open,
-                                                               defaultStartTime,
-                                                               onClose,
-                                                               onConfirm,
-                                                               availableTimes,
-                                                             }) => {
+  court_id,
+  reservation_date,
+  open,
+  defaultStartTime,
+  onClose,
+  onConfirm,
+  availableTimes,
+}) => {
   const [reservationData, setReservationData] = useState<Reservation>({
     court_id,
     reservation_date,
@@ -76,15 +76,24 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
   }, [availableTimes]);
 
   const validEndTimes = useMemo(() => {
-    const timesAfterStart = availableTimes.filter((time) => time > reservationData.start_time);
-
     const startMinutes = getTimeInMinutes(reservationData.start_time);
-    const canEndAt2300 = maxEndMinutes - startMinutes >= 60;
+    const endTimes = availableTimes.filter((time) => {
+      const endMinutes = getTimeInMinutes(time);
+      const duration = endMinutes - startMinutes;
+      return duration >= 60 && endMinutes <= maxEndMinutes;
+    });
 
-    const include2300 = canEndAt2300 && !timesAfterStart.includes('23:00');
+    // Add '23:00' dynamically if it fits the 1 hour min duration and isn't already included
+    if (
+      maxEndMinutes - startMinutes >= 60 && // 1 hour min
+      !endTimes.includes('23:00')
+    ) {
+      return [...endTimes, '23:00'];
+    }
 
-    return include2300 ? [...timesAfterStart, '23:00'] : timesAfterStart;
+    return endTimes;
   }, [availableTimes, reservationData.start_time]);
+
 
   const handleChange = (field: keyof Reservation, value: string) => {
     setReservationData((prevState) => ({
