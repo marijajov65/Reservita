@@ -94,7 +94,6 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
     return endTimes;
   }, [availableTimes, reservationData.start_time]);
 
-
   const handleChange = (field: keyof Reservation, value: string) => {
     setReservationData((prevState) => ({
       ...prevState,
