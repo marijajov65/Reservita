@@ -26,17 +26,17 @@ interface NewReservationProps {
 }
 
 const NewReservationDialog: React.FC<NewReservationProps> = ({
-  court_id,
-  reservation_date,
-  open,
-  defaultStartTime,
-  onClose,
-  onConfirm,
-  availableTimes,
-}) => {
+                                                               court_id,
+                                                               reservation_date,
+                                                               open,
+                                                               defaultStartTime,
+                                                               onClose,
+                                                               onConfirm,
+                                                               availableTimes,
+                                                             }) => {
   const [reservationData, setReservationData] = useState<Reservation>({
-    court_id: court_id,
-    reservation_date: reservation_date,
+    court_id,
+    reservation_date,
     start_time: defaultStartTime,
     end_time: addHours(defaultStartTime, 1),
     name: '',
@@ -45,8 +45,8 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
 
   useEffect(() => {
     setReservationData({
-      court_id: court_id,
-      reservation_date: reservation_date,
+      court_id,
+      reservation_date,
       start_time: defaultStartTime,
       end_time: addHours(defaultStartTime, 1),
       details: '',
@@ -54,7 +54,6 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
     });
   }, [open, defaultStartTime]);
 
-  // Update endTime when startTime changes
   useEffect(() => {
     setReservationData((prevState) => ({
       ...prevState,
@@ -62,10 +61,30 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
     }));
   }, [reservationData.start_time]);
 
-  const validEndTimes = useMemo(
-    () => availableTimes.filter((time) => time > reservationData.start_time),
-    [availableTimes, reservationData.start_time],
-  );
+  const getTimeInMinutes = (time: string): number => {
+    const [hour, minute] = time.split(':').map(Number);
+    return hour * 60 + minute;
+  };
+
+  const maxEndMinutes = getTimeInMinutes('23:00');
+
+  const validStartTimes = useMemo(() => {
+    return availableTimes.filter((time) => {
+      const startMinutes = getTimeInMinutes(time);
+      return startMinutes + 60 <= maxEndMinutes;
+    });
+  }, [availableTimes]);
+
+  const validEndTimes = useMemo(() => {
+    const timesAfterStart = availableTimes.filter((time) => time > reservationData.start_time);
+
+    const startMinutes = getTimeInMinutes(reservationData.start_time);
+    const canEndAt2300 = maxEndMinutes - startMinutes >= 60;
+
+    const include2300 = canEndAt2300 && !timesAfterStart.includes('23:00');
+
+    return include2300 ? [...timesAfterStart, '23:00'] : timesAfterStart;
+  }, [availableTimes, reservationData.start_time]);
 
   const handleChange = (field: keyof Reservation, value: string) => {
     setReservationData((prevState) => ({
@@ -99,7 +118,7 @@ const NewReservationDialog: React.FC<NewReservationProps> = ({
               label="Pocetak Termina"
               onChange={(e) => handleChange('start_time', e.target.value)}
             >
-              {availableTimes.map((time) => (
+              {validStartTimes.map((time) => (
                 <MenuItem key={time} value={time}>
                   {time}
                 </MenuItem>
